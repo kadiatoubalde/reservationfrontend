@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         SignUp.path: (context) => const SignUp(),
         Home.path: (context) => const Home(),
         
-        
+
       },
     );
   }
