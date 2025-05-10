@@ -8,12 +8,14 @@ class Login extends StatefulWidget {
   const Login({super.key});
 
   static String path = "/login";
-
+  
   @override
+
   State<Login> createState() => _LoginState();
 }
-
+  
 class _LoginState extends State<Login> {
+  bool obscurePassword = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +39,7 @@ class _LoginState extends State<Login> {
         child: SingleChildScrollView(
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.center,
+            
             children: [
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.12,
@@ -55,22 +58,43 @@ class _LoginState extends State<Login> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.03,
               ),
-              CustomTextField(
-                title: "Email",
-                customtextfield: CustomTextFormField(
-                  keyboardType: TextInputType.name,
-                  validator: (String? value) =>
-                      Validations.emptyValidation(value),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(
+                   fontSize: 20, 
+                    color: Colors.black, 
+      fontWeight: FontWeight.w500,
+    ),
+                  border: OutlineInputBorder(),
                 ),
               ),
-              CustomTextField(
-                title: "password",
-                customtextfield: CustomTextFormField(
-                  keyboardType: TextInputType.name,
-                  validator: (String? value) =>
-                      Validations.emptyValidation(value),
-                ),
-              ),
+               const SizedBox(height: 15),
+             TextFormField(
+  keyboardType: TextInputType.visiblePassword,
+  obscureText: obscurePassword,
+  validator: (String? value) => Validations.emptyValidation(value),
+  decoration: InputDecoration(
+    labelText: 'Mot de passe',
+     labelStyle: TextStyle(
+      fontSize: 20,
+      color: Colors.black,
+      fontWeight: FontWeight.w500,
+    ),
+    border: const OutlineInputBorder(),
+    suffixIcon: IconButton(
+      icon: Icon(
+        obscurePassword ? Icons.visibility_off : Icons.visibility,
+        color: Colors.grey,
+      ),
+      onPressed: () {
+        setState(() {
+          obscurePassword = !obscurePassword;
+        });
+      },
+    ),
+  ),
+),
               SizedBox(
                 height: 10,
               ),
