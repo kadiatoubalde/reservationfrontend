@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/global_functions/my_styles.dart';
 import '../../../utils/global_widgets/custom_text_field.dart';
+class ResetPassword extends StatefulWidget {
 
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
-
-  static String path = "/signUp";
+  const ResetPassword({super.key});
+  static String path = "/resetPassword";
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<ResetPassword> createState() => _ResetPasswordState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _ResetPasswordState extends State<ResetPassword> {
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
 
@@ -30,9 +29,7 @@ class _SignUpState extends State<SignUp> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
           icon: Icon(
             Icons.arrow_back,
             color: MyStyles.raisinBlack,
@@ -55,16 +52,14 @@ class _SignUpState extends State<SignUp> {
             ),
             const SizedBox(height: 15),
 
-            // Nom
-            _buildTextField("Nom", ""),
-            // Prénom
-            _buildTextField("Prénom", ""),
-            // Email
-            _buildTextField("Email", "", keyboardType: TextInputType.emailAddress),
+            const Text(
+              "Réinitialiser le mot de passe",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
 
-            // Mot de passe
             _buildPasswordField(
-              label: "Mot de passe",
+              label: "Nouveau mot de passe",
               controller: passwordController,
               obscureText: obscurePassword,
               onVisibilityToggle: () {
@@ -74,7 +69,6 @@ class _SignUpState extends State<SignUp> {
               },
             ),
 
-            // Confirmation
             _buildPasswordField(
               label: "Confirmer le mot de passe",
               controller: confirmPasswordController,
@@ -88,7 +82,7 @@ class _SignUpState extends State<SignUp> {
 
             const SizedBox(height: 25),
 
-            // Bouton S'inscrire
+            // Bouton Réinitialiser
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -99,34 +93,21 @@ class _SignUpState extends State<SignUp> {
                       const SnackBar(content: Text("Les mots de passe ne correspondent pas")),
                     );
                   } else {
-                    // Action d'inscription ici
+                    // Action de réinitialisation ici
+                    Navigator.pushReplacementNamed(context, "/login");
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyStyles.egyptianBlue,
-                  foregroundColor: Colors.white, // Texte en blanc
+                  foregroundColor: Colors.white,
                 ),
                 child: const Text(
-                  "S'inscrire",
+                  "Réinitialiser",
                   style: TextStyle(fontSize: 16),
                 ),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, String hint, {TextInputType? keyboardType}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          border: const OutlineInputBorder(),
         ),
       ),
     );
