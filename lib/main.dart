@@ -13,8 +13,9 @@ import 'vues/meduim_screen/reservations/reservations.dart';
 import 'vues/meduim_screen/profile_passager/profile_passager.dart';
 import 'services/notification_service.dart';
 
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialisation du service de notification
   final notificationService = NotificationService();
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         ConfirmationReservation.path: (context) => const ConfirmationReservation(),
         ReservationsPage.path: (context) => const ReservationsPage(),
         ProfilePassager.path: (context) => const ProfilePassager(),
+        
       },
     );
   }

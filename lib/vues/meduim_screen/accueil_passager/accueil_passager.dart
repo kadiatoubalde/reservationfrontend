@@ -25,9 +25,9 @@ class _AccueilPassagerState extends State<AccueilPassager> {
   final DateFormat dateFormat = DateFormat('d MMM yyyy', 'fr_FR');
 
   void _onItemTapped(int index) {
-    setState(() {
+      setState(() {
       _selectedIndex = index;
-    });
+      });
     
     // Navigation vers les différentes pages
     if (index == 1) {
@@ -155,15 +155,15 @@ class _AccueilPassagerState extends State<AccueilPassager> {
 
             // Bouton rechercher
             ElevatedButton(
-              onPressed: () {
-                if (villeDepart != null && villeArrivee != null) {
-                  Navigator.pushNamed(context, ListeVoyagesDisponibles.path);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Veuillez sélectionner les deux villes")),
-                  );
-                }
-              },
+            onPressed: () {
+  if (villeDepart != null && villeArrivee != null) {
+    Navigator.pushNamed(context, ListeVoyagesDisponibles.path);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Veuillez sélectionner les deux villes")),
+    );
+  }
+},
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF213FAA),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
