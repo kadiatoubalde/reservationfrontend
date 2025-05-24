@@ -16,20 +16,18 @@ class Splash extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
         child: SingleChildScrollView(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.23,
+                height: MediaQuery.of(context).size.height * 0.15,
               ),
+              // 🔽 Logo EasyTravel à la place du texte
               Align(
                 alignment: Alignment.center,
-                child: Text(
-                  "Easy Travel",
-                  style: TextStyle(
-                    color: MyStyles.raisinBlack,
-                    fontWeight: FontWeight.bold,
-                    fontSize: MediaQuery.of(context).size.width * 0.05,
-                  ),
+                child: Image.asset(
+                  'assets/images/easytravel_logo.png',
+                  height: MediaQuery.of(context).size.height * 0.22,
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  fit: BoxFit.contain,
                 ),
               ),
               SizedBox(
@@ -37,11 +35,7 @@ class Splash extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  print("click on register");
-                  Navigator.pushNamed(
-                    context,
-                    SignUp.path,
-                  );
+                  Navigator.pushNamed(context, SignUp.path);
                 },
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.1,
@@ -67,11 +61,7 @@ class Splash extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  print("click on login");
-                  Navigator.pushNamed(
-                    context,
-                    Login.path,
-                  );
+                  Navigator.pushNamed(context, Login.path);
                 },
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.1,

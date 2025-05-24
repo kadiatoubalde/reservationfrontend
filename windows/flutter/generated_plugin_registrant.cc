@@ -7,8 +7,14 @@
 #include "generated_plugin_registrant.h"
 
 #include <custom_text_form_field_plus/custom_text_form_field_plus_plugin_c_api.h>
+#include <file_selector_windows/file_selector_windows.h>
+#include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   CustomTextFormFieldPlusPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("CustomTextFormFieldPlusPluginCApi"));
+  FileSelectorWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FileSelectorWindows"));
+  FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
 }
