@@ -3,7 +3,7 @@ import 'api_service.dart';
 import 'dart:convert';
 
 class UtilisateurService {
-  static const String _endpoint = '/utilisateurs';
+  static const String _endpoint = '/api/utilisateurs';
 
   static Future<List<UtilisateurDto>> getAll(String token) async {
     final response = await ApiService.get(_endpoint, token: token);

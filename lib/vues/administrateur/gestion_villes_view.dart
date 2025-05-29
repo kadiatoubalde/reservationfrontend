@@ -2,50 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
-import '../../models/utilisateurDto.dart';
+import '../../models/villeDto.dart';
 import 'dart:convert';
 
-class GestionUtilisateursView extends StatefulWidget {
-  const GestionUtilisateursView({Key? key}) : super(key: key);
+class GestionVillesView extends StatefulWidget {
+  const GestionVillesView({Key? key}) : super(key: key);
 
   @override
-  State<GestionUtilisateursView> createState() => _GestionUtilisateursViewState();
+  State<GestionVillesView> createState() => _GestionVillesViewState();
 }
 
-class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
-  List<UtilisateurDto> _utilisateurs = [];
+class _GestionVillesViewState extends State<GestionVillesView> {
+  List<VilleDto> _villes = [];
   bool _isLoading = true;
   String? _error;
   final _searchController = TextEditingController();
   String _searchQuery = '';
   final _formKey = GlobalKey<FormState>();
   final _nomController = TextEditingController();
-  final _prenomController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _telephoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  String _selectedRole = 'PASSAGER';
   bool _isEditing = false;
-  String? _editingUserId;
+  String? _editingVilleId;
 
   @override
   void initState() {
     super.initState();
-    _loadUtilisateurs();
+    _loadVilles();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _nomController.dispose();
-    _prenomController.dispose();
-    _emailController.dispose();
-    _telephoneController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadUtilisateurs() async {
+  Future<void> _loadVilles() async {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -53,17 +44,17 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
 
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final response = await ApiService.get('/utilisateur/list', token: authService.currentUser?.token);
+      final response = await ApiService.get('/villes', token: authService.currentUser?.token);
       
       if (response.statusCode == 200) {
-        final List<dynamic> utilisateursJson = json.decode(response.body);
+        final List<dynamic> villesJson = json.decode(response.body);
         setState(() {
-          _utilisateurs = utilisateursJson.map((json) => UtilisateurDto.fromJson(json)).toList();
+          _villes = villesJson.map((json) => VilleDto.fromJson(json)).toList();
           _isLoading = false;
         });
       } else {
         setState(() {
-          _error = 'Erreur lors du chargement des utilisateurs';
+          _error = 'Erreur lors du chargement des villes';
           _isLoading = false;
         });
       }
@@ -78,29 +69,20 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
   void _resetForm() {
     _formKey.currentState?.reset();
     _nomController.clear();
-    _prenomController.clear();
-    _emailController.clear();
-    _telephoneController.clear();
-    _passwordController.clear();
-    _selectedRole = 'PASSAGER';
     _isEditing = false;
-    _editingUserId = null;
+    _editingVilleId = null;
   }
 
-  void _editUtilisateur(UtilisateurDto utilisateur) {
+  void _editVille(VilleDto ville) {
     setState(() {
       _isEditing = true;
-      _editingUserId = utilisateur.uuid;
-      _nomController.text = utilisateur.firstname;
-      _prenomController.text = utilisateur.lastname;
-      _emailController.text = utilisateur.email;
-      _telephoneController.text = utilisateur.telephone;
-      _selectedRole = utilisateur.role;
+      _editingVilleId = ville.uuid;
+      _nomController.text = ville.nom;
     });
-    _showUtilisateurForm();
+    _showVilleForm();
   }
 
-  void _showUtilisateurForm() {
+  void _showVilleForm() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -122,7 +104,7 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  _isEditing ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur',
+                  _isEditing ? 'Modifier la ville' : 'Nouvelle ville',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -132,113 +114,15 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
                 TextFormField(
                   controller: _nomController,
                   decoration: const InputDecoration(
-                    labelText: 'Nom',
+                    labelText: 'Nom de la ville',
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.location_city),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nom';
+                      return 'Veuillez entrer le nom de la ville';
                     }
                     return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _prenomController,
-                  decoration: const InputDecoration(
-                    labelText: 'Prénom',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person_outline),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le prénom';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer l\'email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Veuillez entrer un email valide';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _telephoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Téléphone',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le numéro de téléphone';
-                    }
-                    return null;
-                  },
-                ),
-                if (!_isEditing) ...[
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Mot de passe',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
-                    ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (!_isEditing && (value == null || value.isEmpty)) {
-                        return 'Veuillez entrer le mot de passe';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _selectedRole,
-                  decoration: const InputDecoration(
-                    labelText: 'Rôle',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.work),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'PASSAGER',
-                      child: Text('PASSAGER'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'CHAUFFEUR',
-                      child: Text('Chauffeur'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'ADMINISTRATEUR',
-                      child: Text('Administrateur'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedRole = value;
-                      });
-                    }
                   },
                 ),
                 const SizedBox(height: 24),
@@ -275,52 +159,44 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
     if (_formKey.currentState!.validate()) {
       try {
         final authService = Provider.of<AuthService>(context, listen: false);
-        final utilisateurData = {
-          'firstname': _nomController.text,
-          'lastname': _prenomController.text,
-          'email': _emailController.text,
-          'telephone': _telephoneController.text,
-          'role': _selectedRole,
+        final villeData = {
+          'nom': _nomController.text,
         };
 
-        if (!_isEditing) {
-          utilisateurData['password'] = _passwordController.text;
-        }
-
-        if (_isEditing && _editingUserId != null) {
+        if (_isEditing && _editingVilleId != null) {
           final response = await ApiService.put(
-            '/utilisateur/${_editingUserId}',
-            utilisateurData,
+            '/villes/${_editingVilleId}',
+            villeData,
             token: authService.currentUser?.token,
           );
 
           if (response.statusCode == 200) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Utilisateur modifié avec succès')),
+                const SnackBar(content: Text('Ville modifiée avec succès')),
               );
               Navigator.pop(context);
               _resetForm();
-              _loadUtilisateurs();
+              _loadVilles();
             }
           } else {
             throw Exception('Erreur lors de la modification');
           }
         } else {
           final response = await ApiService.post(
-            '/utilisateur',
-            utilisateurData,
+            '/villes',
+            villeData,
             token: authService.currentUser?.token,
           );
 
           if (response.statusCode == 201) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Utilisateur créé avec succès')),
+                const SnackBar(content: Text('Ville créée avec succès')),
               );
               Navigator.pop(context);
               _resetForm();
-              _loadUtilisateurs();
+              _loadVilles();
             }
           } else {
             throw Exception('Erreur lors de la création');
@@ -339,12 +215,12 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
     }
   }
 
-  Future<void> _deleteUtilisateur(String userId) async {
+  Future<void> _deleteVille(String villeId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmer la suppression'),
-        content: const Text('Êtes-vous sûr de vouloir supprimer cet utilisateur ?'),
+        content: const Text('Êtes-vous sûr de vouloir supprimer cette ville ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -362,16 +238,16 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
       try {
         final authService = Provider.of<AuthService>(context, listen: false);
         final response = await ApiService.delete(
-          '/utilisateur/$userId',
+          '/villes/$villeId',
           token: authService.currentUser?.token,
         );
 
         if (response.statusCode == 200) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Utilisateur supprimé avec succès')),
+              const SnackBar(content: Text('Ville supprimée avec succès')),
             );
-            _loadUtilisateurs();
+            _loadVilles();
           }
         } else {
           throw Exception('Erreur lors de la suppression');
@@ -389,16 +265,12 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
     }
   }
 
-  List<UtilisateurDto> get _filteredUtilisateurs {
-    if (_searchQuery.isEmpty) return _utilisateurs;
-    return _utilisateurs.where((utilisateur) {
-      final nom = utilisateur.firstname.toLowerCase();
-      final prenom = utilisateur.lastname.toLowerCase();
-      final email = utilisateur.email.toLowerCase();
+  List<VilleDto> get _filteredVilles {
+    if (_searchQuery.isEmpty) return _villes;
+    return _villes.where((ville) {
+      final nom = ville.nom.toLowerCase();
       final query = _searchQuery.toLowerCase();
-      return nom.contains(query) ||
-          prenom.contains(query) ||
-          email.contains(query);
+      return nom.contains(query);
     }).toList();
   }
 
@@ -406,11 +278,11 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion des Utilisateurs'),
+        title: const Text('Gestion des Villes'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadUtilisateurs,
+            onPressed: _loadVilles,
             tooltip: 'Actualiser',
           ),
         ],
@@ -422,7 +294,7 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Rechercher un utilisateur...',
+                hintText: 'Rechercher une ville...',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -456,46 +328,30 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
                             ),
                             const SizedBox(height: 16),
                             ElevatedButton(
-                              onPressed: _loadUtilisateurs,
+                              onPressed: _loadVilles,
                               child: const Text('Réessayer'),
                             ),
                           ],
                         ),
                       )
-                    : _filteredUtilisateurs.isEmpty
+                    : _filteredVilles.isEmpty
                         ? const Center(
-                            child: Text('Aucun utilisateur trouvé'),
+                            child: Text('Aucune ville trouvée'),
                           )
                         : ListView.builder(
-                            itemCount: _filteredUtilisateurs.length,
+                            itemCount: _filteredVilles.length,
                             itemBuilder: (context, index) {
-                              final utilisateur = _filteredUtilisateurs[index];
+                              final ville = _filteredVilles[index];
                               return Card(
                                 margin: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 8,
                                 ),
                                 child: ListTile(
-                                  leading: CircleAvatar(
-                                    child: Text(
-                                      utilisateur.lastname[0].toUpperCase(),
-                                    ),
+                                  leading: const CircleAvatar(
+                                    child: Icon(Icons.location_city),
                                   ),
-                                  title: Text(
-                                    '${utilisateur.lastname} ${utilisateur.firstname}',
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(utilisateur.email),
-                                      Text(
-                                        'Rôle: ${utilisateur.role}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  title: Text(ville.nom),
                                   trailing: PopupMenuButton(
                                     itemBuilder: (context) => [
                                       const PopupMenuItem(
@@ -509,9 +365,9 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
                                     ],
                                     onSelected: (value) {
                                       if (value == 'edit') {
-                                        _editUtilisateur(utilisateur);
-                                      } else if (value == 'delete' && utilisateur.uuid != null) {
-                                        _deleteUtilisateur(utilisateur.uuid!);
+                                        _editVille(ville);
+                                      } else if (value == 'delete' && ville.uuid != null) {
+                                        _deleteVille(ville.uuid!);
                                       }
                                     },
                                   ),
@@ -525,7 +381,7 @@ class _GestionUtilisateursViewState extends State<GestionUtilisateursView> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _resetForm();
-          _showUtilisateurForm();
+          _showVilleForm();
         },
         child: const Icon(Icons.add),
       ),
