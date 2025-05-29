@@ -26,121 +26,80 @@ class ListeTrajetsAffectesView extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    // Données fictives pour la démonstration
+    final List<Map<String, dynamic>> trajets = [
+      {
+        'id': 1,
+        'depart': 'Paris',
+        'arrivee': 'Lyon',
+        'date': '2024-03-20',
+        'heure': '10:00',
+        'statut': 'En attente',
+        'passagers': 3,
+      },
+      {
+        'id': 2,
+        'depart': 'Marseille',
+        'arrivee': 'Nice',
+        'date': '2024-03-21',
+        'heure': '14:30',
+        'statut': 'En cours',
+        'passagers': 5,
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes trajets'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authService.logout();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
-            },
-          ),
-        ],
+        title: const Text('Mes Trajets'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text('${user?.firstname ?? ''} ${user?.lastname ?? ''}'),
-              accountEmail: Text(user?.email ?? ''),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(
-                  user?.firstname?.substring(0, 1).toUpperCase() ?? '',
-                  style: const TextStyle(fontSize: 40.0),
+      body: ListView.builder(
+        itemCount: trajets.length,
+        itemBuilder: (context, index) {
+          final trajet = trajets[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(16),
+              title: Text(
+                '${trajet['depart']} → ${trajet['arrivee']}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.route),
-              title: const Text('Mes trajets'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/chauffeur/liste_trajets_affectes');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.confirmation_number),
-              title: const Text('Gestion des réservations'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/chauffeur/gestion_reservations_recues');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.check_circle),
-              title: const Text('Validation des check-ins'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/chauffeur/validation_checkin');
-              },
-            ),
-          ],
-        ),
-      ),
-      body: GridView.count(
-        padding: const EdgeInsets.all(16),
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        children: [
-          _buildDashboardCard(
-            context,
-            'Mes trajets',
-            Icons.route,
-            '/chauffeur/liste_trajets_affectes',
-          ),
-          _buildDashboardCard(
-            context,
-            'Gestion des réservations',
-            Icons.confirmation_number,
-            '/chauffeur/gestion_reservations_recues',
-          ),
-          _buildDashboardCard(
-            context,
-            'Validation des check-ins',
-            Icons.check_circle,
-            '/chauffeur/validation_checkin',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDashboardCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    String route,
-  ) {
-    return Card(
-      elevation: 4,
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, route),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 48,
-              color: Theme.of(context).primaryColor,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Text('Date: ${trajet['date']} à ${trajet['heure']}'),
+                  const SizedBox(height: 4),
+                  Text('Passagers: ${trajet['passagers']}'),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: trajet['statut'] == 'En cours' ? Colors.green : Colors.orange,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      trajet['statut'],
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                onPressed: () {
+                  // TODO: Naviguer vers les détails du trajet
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fonctionnalité à implémenter')),
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

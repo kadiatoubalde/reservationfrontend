@@ -3,8 +3,73 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
 
-class RechercheTrajetsView extends StatelessWidget {
+class RechercheTrajetsView extends StatefulWidget {
   const RechercheTrajetsView({Key? key}) : super(key: key);
+
+  @override
+  State<RechercheTrajetsView> createState() => _RechercheTrajetsViewState();
+}
+
+class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
+  final _villeDepartController = TextEditingController();
+  final _villeArriveeController = TextEditingController();
+  DateTime _dateDepart = DateTime.now();
+  TimeOfDay _heureDepart = TimeOfDay.now();
+
+  // Données fictives pour la démonstration
+  final List<Map<String, dynamic>> _trajets = [
+    {
+      'id': 1,
+      'depart': 'Paris',
+      'arrivee': 'Lyon',
+      'date': '2024-03-20',
+      'heure': '10:00',
+      'prix': 50.0,
+      'places': 5,
+    },
+    {
+      'id': 2,
+      'depart': 'Marseille',
+      'arrivee': 'Nice',
+      'date': '2024-03-21',
+      'heure': '14:30',
+      'prix': 30.0,
+      'places': 3,
+    },
+  ];
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _dateDepart,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null && picked != _dateDepart) {
+      setState(() {
+        _dateDepart = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _heureDepart,
+    );
+    if (picked != null && picked != _heureDepart) {
+      setState(() {
+        _heureDepart = picked;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _villeDepartController.dispose();
+    _villeArriveeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,119 +79,125 @@ class RechercheTrajetsView extends StatelessWidget {
 
     if (!authService.isAuthenticated || userRole != 'PASSAGER') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Accès refusé. Vous n\'avez pas le rôle Passager.'),
-              backgroundColor: Colors.redAccent,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        Navigator.pushReplacementNamed(context, '/login'); 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Accès refusé. Vous n\'avez pas le rôle Passager.'),
+            backgroundColor: Colors.redAccent,
+            duration: Duration(seconds: 3),
+          ),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
       });
       return const SizedBox.shrink();
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recherche de trajets'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authService.logout();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
-            },
-          ),
-        ],
+        title: const Text('Recherche de Trajets'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text('${user?.firstname ?? ''} ${user?.lastname ?? ''}'),
-              accountEmail: Text(user?.email ?? ''),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(
-                  user?.firstname?.substring(0, 1).toUpperCase() ?? '',
-                  style: const TextStyle(fontSize: 40.0),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.search),
-              title: const Text('Rechercher des trajets'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/passager/recherche_trajets');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.confirmation_number),
-              title: const Text('Mes réservations'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/passager/liste_reservations');
-              },
-            ),
-          ],
-        ),
-      ),
-      body: GridView.count(
-        padding: const EdgeInsets.all(16),
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+      body: Column(
         children: [
-          _buildDashboardCard(
-            context,
-            'Rechercher des trajets',
-            Icons.search,
-            '/passager/recherche_trajets',
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _villeDepartController,
+                  decoration: const InputDecoration(
+                    labelText: 'Ville de départ',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.location_on),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _villeArriveeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Ville d\'arrivée',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.location_on),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  title: const Text('Date de départ'),
+                  subtitle: Text(
+                    '${_dateDepart.day}/${_dateDepart.month}/${_dateDepart.year}',
+                  ),
+                  trailing: const Icon(Icons.calendar_today),
+                  onTap: () => _selectDate(context),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  title: const Text('Heure de départ'),
+                  subtitle: Text(_heureDepart.format(context)),
+                  trailing: const Icon(Icons.access_time),
+                  onTap: () => _selectTime(context),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // TODO: Implémenter la recherche de trajets
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Recherche en cours...'),
+                        backgroundColor: Colors.blue,
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text('Rechercher'),
+                  ),
+                ),
+              ],
+            ),
           ),
-          _buildDashboardCard(
-            context,
-            'Mes réservations',
-            Icons.confirmation_number,
-            '/passager/liste_reservations',
+          Expanded(
+            child: ListView.builder(
+              itemCount: _trajets.length,
+              itemBuilder: (context, index) {
+                final trajet = _trajets[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    title: Text(
+                      '${trajet['depart']} → ${trajet['arrivee']}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        Text('Date: ${trajet['date']} à ${trajet['heure']}'),
+                        const SizedBox(height: 4),
+                        Text('Prix: ${trajet['prix']} €'),
+                        const SizedBox(height: 4),
+                        Text('Places disponibles: ${trajet['places']}'),
+                      ],
+                    ),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        // TODO: Naviguer vers la page de réservation
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Redirection vers la réservation...'),
+                            backgroundColor: Colors.blue,
+                          ),
+                        );
+                      },
+                      child: const Text('Réserver'),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDashboardCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    String route,
-  ) {
-    return Card(
-      elevation: 4,
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, route),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 48,
-              color: Theme.of(context).primaryColor,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
