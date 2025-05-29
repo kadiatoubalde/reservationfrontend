@@ -1,0 +1,6 @@
+enum StatutEnum {
+  EN_ATTENTE,
+  CONFIRMEE,
+  ANNULEE,
+  TERMINEE
+} 
