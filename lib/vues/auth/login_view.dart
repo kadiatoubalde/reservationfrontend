@@ -70,6 +70,12 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/images/easytravel_logo.png',
+                height: 200,
+                width: 200,
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
@@ -103,8 +109,13 @@ class _LoginViewState extends State<LoginView> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
                   child: _isLoading
-                      ? const CircularProgressIndicator()
+                      ? const CircularProgressIndicator(color: Colors.white)
                       : const Text('Se connecter'),
                 ),
               ),

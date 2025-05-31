@@ -1,6 +1,7 @@
 enum EnumTypeVehicule {
-  VOITURE,
-  CAMION,
-  BUS,
-  MOTO
+   BUS,
+   MINI_BUS,
+   TAXI
+   ,
+  
 } 
