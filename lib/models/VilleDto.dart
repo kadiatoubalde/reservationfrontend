@@ -1,16 +1,16 @@
 class VilleDto {
-  final String? uuid;
-  final String nom;
+  String? uuid;
+  String nom;
 
   VilleDto({
     this.uuid,
-    required this.nom,
+    this.nom = '',
   });
 
   factory VilleDto.fromJson(Map<String, dynamic> json) {
     return VilleDto(
       uuid: json['uuid'],
-      nom: json['nom'],
+      nom: json['nom'] ?? '',
     );
   }
 

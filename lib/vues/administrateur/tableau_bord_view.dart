@@ -5,6 +5,7 @@ import '../../models/user.dart';
 import 'gestion_utilisateurs_view.dart';
 import 'creation_trajets_view.dart';
 import 'attribution_trajets_chauffeurs_view.dart';
+import 'gestion_villes_view.dart';
 
 class TableauBordView extends StatefulWidget {
   const TableauBordView({Key? key}) : super(key: key);
@@ -163,6 +164,14 @@ class _TableauBordViewState extends State<TableauBordView> with SingleTickerProv
                 _navigateToView(const AttributionTrajetsChauffeursView());
               },
             ),
+            _buildDrawerItem(
+              icon: Icons.location_city,
+              title: 'Gestion des villes',
+              onTap: () {
+                Navigator.pop(context);
+                _navigateToView(const GestionVillesView());
+              },
+            ),
             const Divider(),
             _buildDrawerItem(
               icon: Icons.settings,
@@ -212,6 +221,13 @@ class _TableauBordViewState extends State<TableauBordView> with SingleTickerProv
               Icons.assignment,
               const AttributionTrajetsChauffeursView(),
               2,
+            ),
+            _buildDashboardCard(
+              context,
+              'Gestion des villes',
+              Icons.location_city,
+              const GestionVillesView(),
+              3,
             ),
           ],
         ),

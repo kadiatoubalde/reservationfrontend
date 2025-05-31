@@ -19,6 +19,7 @@ import 'vues/administrateur/gestion_utilisateurs_view.dart';
 import 'vues/administrateur/creation_trajets_view.dart';
 import 'vues/administrateur/attribution_trajets_chauffeurs_view.dart';
 import 'vues/administrateur/tableau_bord_view.dart';
+import 'vues/administrateur/gestion_villes_view.dart';
 
 class Routes {
   static const String login = '/login';
@@ -39,6 +40,7 @@ class Routes {
   static const String adminCreationTrajets = '/admin/creation_trajets';
   static const String adminAttributionTrajetsChauffeurs = '/admin/attribution_trajets_chauffeurs';
   static const String adminTableauBord = '/admin/tableau_bord';
+  static const String adminGestionVilles = '/admin/gestion_villes';
 
   static Route<dynamic> generateRoute(RouteSettings settings, BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -114,6 +116,10 @@ class Routes {
       case adminTableauBord:
         return MaterialPageRoute(
           builder: (_) => const TableauBordView(),
+        );
+      case adminGestionVilles:
+        return MaterialPageRoute(
+          builder: (_) => const GestionVillesView(),
         );
 
       default:

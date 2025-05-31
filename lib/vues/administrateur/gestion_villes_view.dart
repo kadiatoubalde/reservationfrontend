@@ -13,15 +13,11 @@ class GestionVillesView extends StatefulWidget {
 }
 
 class _GestionVillesViewState extends State<GestionVillesView> {
+  final _formKey = GlobalKey<FormState>();
+  final _nomController = TextEditingController();
   List<VilleDto> _villes = [];
   bool _isLoading = true;
   String? _error;
-  final _searchController = TextEditingController();
-  String _searchQuery = '';
-  final _formKey = GlobalKey<FormState>();
-  final _nomController = TextEditingController();
-  bool _isEditing = false;
-  String? _editingVilleId;
 
   @override
   void initState() {
@@ -31,7 +27,6 @@ class _GestionVillesViewState extends State<GestionVillesView> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _nomController.dispose();
     super.dispose();
   }
@@ -66,141 +61,34 @@ class _GestionVillesViewState extends State<GestionVillesView> {
     }
   }
 
-  void _resetForm() {
-    _formKey.currentState?.reset();
-    _nomController.clear();
-    _isEditing = false;
-    _editingVilleId = null;
-  }
-
-  void _editVille(VilleDto ville) {
-    setState(() {
-      _isEditing = true;
-      _editingVilleId = ville.uuid;
-      _nomController.text = ville.nom;
-    });
-    _showVilleForm();
-  }
-
-  void _showVilleForm() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  _isEditing ? 'Modifier la ville' : 'Nouvelle ville',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _nomController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom de la ville',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.location_city),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer le nom de la ville';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _resetForm();
-                        },
-                        child: const Text('Annuler'),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _submitForm,
-                        child: Text(_isEditing ? 'Modifier' : 'Créer'),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _submitForm() async {
+  Future<void> _ajouterVille() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
         final authService = Provider.of<AuthService>(context, listen: false);
         final villeData = {
           'nom': _nomController.text,
         };
 
-        if (_isEditing && _editingVilleId != null) {
-          final response = await ApiService.put(
-            '/villes/${_editingVilleId}',
-            villeData,
-            token: authService.currentUser?.token,
-          );
+        final response = await ApiService.post(
+          '/villes',
+          villeData,
+          token: authService.currentUser?.token,
+        );
 
-          if (response.statusCode == 200) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Ville modifiée avec succès')),
-              );
-              Navigator.pop(context);
-              _resetForm();
-              _loadVilles();
-            }
-          } else {
-            throw Exception('Erreur lors de la modification');
+        if (response.statusCode == 201) {
+          _nomController.clear();
+          await _loadVilles();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Ville ajoutée avec succès')),
+            );
           }
         } else {
-          final response = await ApiService.post(
-            '/villes',
-            villeData,
-            token: authService.currentUser?.token,
-          );
-
-          if (response.statusCode == 201) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Ville créée avec succès')),
-              );
-              Navigator.pop(context);
-              _resetForm();
-              _loadVilles();
-            }
-          } else {
-            throw Exception('Erreur lors de la création');
-          }
+          throw Exception('Erreur lors de l\'ajout de la ville');
         }
       } catch (e) {
         if (mounted) {
@@ -211,11 +99,17 @@ class _GestionVillesViewState extends State<GestionVillesView> {
             ),
           );
         }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
 
-  Future<void> _deleteVille(String villeId) async {
+  Future<void> _supprimerVille(String villeId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -235,6 +129,10 @@ class _GestionVillesViewState extends State<GestionVillesView> {
     );
 
     if (confirmed == true) {
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
         final authService = Provider.of<AuthService>(context, listen: false);
         final response = await ApiService.delete(
@@ -242,15 +140,15 @@ class _GestionVillesViewState extends State<GestionVillesView> {
           token: authService.currentUser?.token,
         );
 
-        if (response.statusCode == 200) {
+        if (response.statusCode == 204) {
+          await _loadVilles();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Ville supprimée avec succès')),
             );
-            _loadVilles();
           }
         } else {
-          throw Exception('Erreur lors de la suppression');
+          throw Exception('Erreur lors de la suppression de la ville');
         }
       } catch (e) {
         if (mounted) {
@@ -261,17 +159,14 @@ class _GestionVillesViewState extends State<GestionVillesView> {
             ),
           );
         }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
-  }
-
-  List<VilleDto> get _filteredVilles {
-    if (_searchQuery.isEmpty) return _villes;
-    return _villes.where((ville) {
-      final nom = ville.nom.toLowerCase();
-      final query = _searchQuery.toLowerCase();
-      return nom.contains(query);
-    }).toList();
   }
 
   @override
@@ -287,104 +182,91 @@ class _GestionVillesViewState extends State<GestionVillesView> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Rechercher une ville...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
-              ),
-              onChanged: (value) {
-                setState(() => _searchQuery = value);
-              },
-            ),
-          ),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadVilles,
+                        child: const Text('Réessayer'),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Row(
                           children: [
-                            Text(
-                              _error!,
-                              style: const TextStyle(color: Colors.red),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _nomController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Nom de la ville',
+                                  border: OutlineInputBorder(),
+                                  prefixIcon: Icon(Icons.location_city),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez entrer un nom de ville';
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _loadVilles,
-                              child: const Text('Réessayer'),
+                            const SizedBox(width: 16),
+                            ElevatedButton.icon(
+                              onPressed: _ajouterVille,
+                              icon: const Icon(Icons.add),
+                              label: const Text('Ajouter'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                              ),
                             ),
                           ],
                         ),
-                      )
-                    : _filteredVilles.isEmpty
-                        ? const Center(
-                            child: Text('Aucune ville trouvée'),
-                          )
-                        : ListView.builder(
-                            itemCount: _filteredVilles.length,
-                            itemBuilder: (context, index) {
-                              final ville = _filteredVilles[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: ListTile(
-                                  leading: const CircleAvatar(
-                                    child: Icon(Icons.location_city),
-                                  ),
-                                  title: Text(ville.nom),
-                                  trailing: PopupMenuButton(
-                                    itemBuilder: (context) => [
-                                      const PopupMenuItem(
-                                        value: 'edit',
-                                        child: Text('Modifier'),
-                                      ),
-                                      const PopupMenuItem(
-                                        value: 'delete',
-                                        child: Text('Supprimer'),
-                                      ),
-                                    ],
-                                    onSelected: (value) {
-                                      if (value == 'edit') {
-                                        _editVille(ville);
-                                      } else if (value == 'delete' && ville.uuid != null) {
-                                        _deleteVille(ville.uuid!);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _resetForm();
-          _showVilleForm();
-        },
-        child: const Icon(Icons.add),
-      ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _villes.length,
+                        itemBuilder: (context, index) {
+                          final ville = _villes[index];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: ListTile(
+                              leading: const Icon(Icons.location_city),
+                              title: Text(ville.nom),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  if (ville.uuid != null) {
+                                    _supprimerVille(ville.uuid!);
+                                  }
+                                },
+                                tooltip: 'Supprimer la ville',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
     );
   }
 } 

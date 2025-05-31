@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../models/villeDto.dart';
 import 'dart:convert';
+import '../../routes.dart';
 
 class CreationTrajetsView extends StatefulWidget {
   const CreationTrajetsView({Key? key}) : super(key: key);
@@ -179,7 +180,7 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
           IconButton(
             icon: const Icon(Icons.location_city),
             onPressed: () {
-              Navigator.pushNamed(context, '/gestion-villes');
+              Navigator.pushNamed(context, Routes.adminGestionVilles);
             },
             tooltip: 'Gérer les villes',
           ),
