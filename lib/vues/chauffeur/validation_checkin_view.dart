@@ -15,7 +15,7 @@ class _ValidationCheckinViewState extends State<ValidationCheckinView> {
     {
       'id': 1,
       'passager': 'Jean Dupont',
-      'trajet': 'Paris → Lyon',
+      'trajet': 'Fria → Conakry',
       'date': '2024-03-20',
       'heure': '10:00',
       'statut': 'En attente',
@@ -24,7 +24,7 @@ class _ValidationCheckinViewState extends State<ValidationCheckinView> {
     {
       'id': 2,
       'passager': 'Marie Martin',
-      'trajet': 'Marseille → Nice',
+      'trajet': 'Mamou → Labé',
       'date': '2024-03-21',
       'heure': '14:30',
       'statut': 'Validé',

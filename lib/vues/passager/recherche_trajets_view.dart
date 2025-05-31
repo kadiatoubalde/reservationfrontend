@@ -20,8 +20,8 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
   final List<Map<String, dynamic>> _trajets = [
     {
       'id': 1,
-      'depart': 'Paris',
-      'arrivee': 'Lyon',
+      'depart': 'Fria',
+      'arrivee': 'Conakry',
       'date': '2024-03-20',
       'heure': '10:00',
       'prix': 50.0,
@@ -29,8 +29,8 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
     },
     {
       'id': 2,
-      'depart': 'Marseille',
-      'arrivee': 'Nice',
+      'depart': 'Mamou',
+      'arrivee': 'Labé',
       'date': '2024-03-21',
       'heure': '14:30',
       'prix': 30.0,

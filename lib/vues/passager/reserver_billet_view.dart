@@ -20,8 +20,8 @@ class _ReserverBilletViewState extends State<ReserverBilletView> {
   // Données fictives du trajet pour la démonstration
   final Map<String, dynamic> _trajet = {
     'id': 1,
-    'depart': 'Paris',
-    'arrivee': 'Lyon',
+    'depart': 'Fria',
+    'arrivee': 'Conakry',
     'date': '2024-03-20',
     'heure': '10:00',
     'prix': 50.0,
