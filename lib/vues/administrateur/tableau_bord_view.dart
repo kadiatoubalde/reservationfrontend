@@ -63,11 +63,6 @@ class _TableauBordViewState extends State<TableauBordView> with SingleTickerProv
     final authService = Provider.of<AuthService>(context);
     final user = authService.currentUser;
 
-    // Debug logs
-    print('DEBUG: User authentication status: ${authService.isAuthenticated}');
-    print('DEBUG: Current user: ${user?.toJson()}');
-    print('DEBUG: User role: ${user?.role}');
-
     if (!authService.isAuthenticated || user?.role != 'ADMINISTRATEUR') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(

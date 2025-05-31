@@ -18,6 +18,8 @@ class _GestionVillesViewState extends State<GestionVillesView> {
   List<VilleDto> _villes = [];
   bool _isLoading = true;
   String? _error;
+  bool _isEditing = false;
+  String? _editingVilleId;
 
   @override
   void initState() {
@@ -29,6 +31,15 @@ class _GestionVillesViewState extends State<GestionVillesView> {
   void dispose() {
     _nomController.dispose();
     super.dispose();
+  }
+
+  void _resetForm() {
+    _formKey.currentState?.reset();
+    _nomController.clear();
+    setState(() {
+      _isEditing = false;
+      _editingVilleId = null;
+    });
   }
 
   Future<void> _loadVilles() async {
@@ -61,7 +72,15 @@ class _GestionVillesViewState extends State<GestionVillesView> {
     }
   }
 
-  Future<void> _ajouterVille() async {
+  void _editVille(VilleDto ville) {
+    setState(() {
+      _isEditing = true;
+      _editingVilleId = ville.uuid;
+      _nomController.text = ville.nom;
+    });
+  }
+
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -73,22 +92,42 @@ class _GestionVillesViewState extends State<GestionVillesView> {
           'nom': _nomController.text,
         };
 
-        final response = await ApiService.post(
-          '/villes',
-          villeData,
-          token: authService.currentUser?.token,
-        );
+        if (_isEditing && _editingVilleId != null) {
+          final response = await ApiService.put(
+            '/villes/${_editingVilleId}',
+            villeData,
+            token: authService.currentUser?.token,
+          );
 
-        if (response.statusCode == 201) {
-          _nomController.clear();
-          await _loadVilles();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Ville ajoutée avec succès')),
-            );
+          if (response.statusCode == 200) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Ville modifiée avec succès')),
+              );
+              _resetForm();
+              await _loadVilles();
+            }
+          } else {
+            throw Exception('Erreur lors de la modification de la ville');
           }
         } else {
-          throw Exception('Erreur lors de l\'ajout de la ville');
+          final response = await ApiService.post(
+            '/villes',
+            villeData,
+            token: authService.currentUser?.token,
+          );
+
+          if (response.statusCode == 201) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Ville ajoutée avec succès')),
+              );
+              _resetForm();
+              await _loadVilles();
+            }
+          } else {
+            throw Exception('Erreur lors de l\'ajout de la ville');
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -207,32 +246,48 @@ class _GestionVillesViewState extends State<GestionVillesView> {
                       padding: const EdgeInsets.all(16.0),
                       child: Form(
                         key: _formKey,
-                        child: Row(
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _nomController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Nom de la ville',
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.location_city),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _nomController,
+                                    decoration: InputDecoration(
+                                      labelText: _isEditing ? 'Nouveau nom de la ville' : 'Nom de la ville',
+                                      border: const OutlineInputBorder(),
+                                      prefixIcon: const Icon(Icons.location_city),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Veuillez entrer un nom de ville';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Veuillez entrer un nom de ville';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            ElevatedButton.icon(
-                              onPressed: _ajouterVille,
-                              icon: const Icon(Icons.add),
-                              label: const Text('Ajouter'),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                              ),
+                                const SizedBox(width: 16),
+                                ElevatedButton.icon(
+                                  onPressed: _submitForm,
+                                  icon: Icon(_isEditing ? Icons.save : Icons.add),
+                                  label: Text(_isEditing ? 'Modifier' : 'Ajouter'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                  ),
+                                ),
+                                if (_isEditing) ...[
+                                  const SizedBox(width: 8),
+                                  ElevatedButton.icon(
+                                    onPressed: _resetForm,
+                                    icon: const Icon(Icons.cancel),
+                                    label: const Text('Annuler'),
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      backgroundColor: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),
@@ -251,14 +306,24 @@ class _GestionVillesViewState extends State<GestionVillesView> {
                             child: ListTile(
                               leading: const Icon(Icons.location_city),
                               title: Text(ville.nom),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  if (ville.uuid != null) {
-                                    _supprimerVille(ville.uuid!);
-                                  }
-                                },
-                                tooltip: 'Supprimer la ville',
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () => _editVille(ville),
+                                    tooltip: 'Modifier la ville',
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      if (ville.uuid != null) {
+                                        _supprimerVille(ville.uuid!);
+                                      }
+                                    },
+                                    tooltip: 'Supprimer la ville',
+                                  ),
+                                ],
                               ),
                             ),
                           );

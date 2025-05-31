@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
     
     return MaterialApp(
       title: 'Système de Réservation',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
