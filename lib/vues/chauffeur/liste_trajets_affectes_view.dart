@@ -30,8 +30,8 @@ class ListeTrajetsAffectesView extends StatelessWidget {
     final List<Map<String, dynamic>> trajets = [
       {
         'id': 1,
-        'depart': 'Paris',
-        'arrivee': 'Lyon',
+        'depart': 'Fria',
+        'arrivee': 'Conakry',
         'date': '2024-03-20',
         'heure': '10:00',
         'statut': 'En attente',
@@ -39,8 +39,8 @@ class ListeTrajetsAffectesView extends StatelessWidget {
       },
       {
         'id': 2,
-        'depart': 'Marseille',
-        'arrivee': 'Nice',
+        'depart': 'Mamou',
+        'arrivee': 'Labé',
         'date': '2024-03-21',
         'heure': '14:30',
         'statut': 'En cours',
