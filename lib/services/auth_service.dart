@@ -124,6 +124,11 @@ class AuthService extends ChangeNotifier {
       return false;
     }
     
+    // Allow access to the profile page for any authenticated user
+    if (route == '/profil') {
+      return true;
+    }
+
     switch (userRole) {
       case 'ADMINISTRATEUR':
         return route.startsWith('/admin/') || 

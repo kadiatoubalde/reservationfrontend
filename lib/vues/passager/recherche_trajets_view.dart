@@ -95,6 +95,55 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
       appBar: AppBar(
         title: const Text('Recherche de Trajets'),
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu Passager',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Mon Profil'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.pushNamed(context, '/profil');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.book_online),
+              title: const Text('Mes Réservations'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.pushNamed(context, '/passager/liste_reservations');
+              },
+            ),
+            // Add more items as needed for the passenger role
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Déconnexion'),
+              onTap: () async {
+                // TODO: Implement logout logic
+                 final authService = Provider.of<AuthService>(context, listen: false);
+                 await authService.logout();
+                 if (mounted) {
+                   Navigator.pushReplacementNamed(context, '/login');
+                 }
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Padding(

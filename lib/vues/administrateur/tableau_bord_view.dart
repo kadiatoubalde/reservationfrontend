@@ -169,6 +169,14 @@ class _TableauBordViewState extends State<TableauBordView> with SingleTickerProv
             ),
             const Divider(),
             _buildDrawerItem(
+              icon: Icons.person,
+              title: 'Mon Profil',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/profil');
+              },
+            ),
+            _buildDrawerItem(
               icon: Icons.settings,
               title: 'Paramètres',
               onTap: () {
@@ -177,6 +185,18 @@ class _TableauBordViewState extends State<TableauBordView> with SingleTickerProv
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Fonctionnalité à venir')),
                 );
+              },
+            ),
+            const Divider(),
+            _buildDrawerItem(
+              icon: Icons.logout,
+              title: 'Déconnexion',
+              onTap: () async {
+                final authService = Provider.of<AuthService>(context, listen: false);
+                await authService.logout();
+                if (mounted) {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
               },
             ),
           ],

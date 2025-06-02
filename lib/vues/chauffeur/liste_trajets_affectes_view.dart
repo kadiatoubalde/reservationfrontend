@@ -3,9 +3,14 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
 
-class ListeTrajetsAffectesView extends StatelessWidget {
+class ListeTrajetsAffectesView extends StatefulWidget {
   const ListeTrajetsAffectesView({Key? key}) : super(key: key);
 
+  @override
+  State<ListeTrajetsAffectesView> createState() => _ListeTrajetsAffectesViewState();
+}
+
+class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
@@ -51,6 +56,54 @@ class ListeTrajetsAffectesView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes Trajets'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu Chauffeur',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_shipping),
+              title: const Text('Mes Trajets Affectés'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                // Stay on the current page
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Mon Profil'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.pushNamed(context, '/profil');
+              },
+            ),
+            // Add more items as needed for the chauffeur role
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Déconnexion'),
+              onTap: () async {
+                 final authService = Provider.of<AuthService>(context, listen: false);
+                 await authService.logout();
+                 if (mounted) {
+                   Navigator.pushReplacementNamed(context, '/login');
+                 }
+              },
+            ),
+          ],
+        ),
       ),
       body: ListView.builder(
         itemCount: trajets.length,

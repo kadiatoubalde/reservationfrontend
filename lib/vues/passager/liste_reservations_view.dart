@@ -1,56 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/reservation_service.dart';
+import '../../models/reservationDto.dart';
 
-class ListeReservationsView extends StatelessWidget {
+class ListeReservationsView extends StatefulWidget {
   const ListeReservationsView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
-    final userRole = authService.userRole; // Get user role from AuthService
+  State<ListeReservationsView> createState() => _ListeReservationsViewState();
+}
 
-    // Check if user is authenticated and has the PASSAGER role
-    if (!authService.isAuthenticated || userRole != 'PASSAGER') {
-      // If not authenticated or not PASSAGER, show access denied message and redirect
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Accès refusé. Vous n\'avez pas le rôle Passager.'), // Specific message for Passager
-              backgroundColor: Colors.redAccent,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        // Redirect to login as this view is specifically for PASSAGER.
-        Navigator.pushReplacementNamed(context, '/login'); 
+class _ListeReservationsViewState extends State<ListeReservationsView> {
+  List<ReservationDto> _reservations = [];
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReservations();
+  }
+
+  Future<void> _loadReservations() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final token = authService.currentUser?.token;
+
+      if (token != null) {
+        // Assuming getAll fetches reservations for the current user with their token
+        // If not, we might need a specific endpoint or filter on the client side.
+        _reservations = await ReservationService.getAll(token);
+      } else {
+        _error = 'Utilisateur non authentifié';
+      }
+    } catch (e) {
+      _error = 'Erreur lors du chargement des réservations: ${e.toString()}';
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
-      // Return an empty widget while the redirection happens
-      return const SizedBox.shrink();
     }
+  }
 
-    // If authenticated and is PASSAGER, show the actual view content
-    // Dummy list of reservations
-    final List<String> _reservations = [
-      'Réservation 1: Trajet A vers B, 2 billets',
-      'Réservation 2: Trajet C vers D, 1 billet',
-      'Réservation 3: Trajet E vers F, 3 billets',
-    ];
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liste des réservations'),
+        title: const Text('Mes Réservations'),
       ),
-      body: _reservations.isEmpty
-          ? const Center(child: Text('Aucune réservation trouvée.'))
-          : ListView.builder(
-              itemCount: _reservations.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_reservations[index]),
-                  // TODO: Add more reservation details and onTap for reservation details view if needed
-                );
-              },
-            ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Text(_error!))
+              : _reservations.isEmpty
+                  ? const Center(child: Text('Aucune réservation trouvée'))
+                  : ListView.builder(
+                      itemCount: _reservations.length,
+                      itemBuilder: (context, index) {
+                        final reservation = _reservations[index];
+                        return ListTile(
+                          title: Text(
+                              '${reservation.pointDepart ?? 'N/A'} → ${reservation.pointArriver ?? 'N/A'}'),
+                          subtitle: Text(
+                              'Date: ${reservation.uuidTrajet ?? 'N/A'} - Montant: ${reservation.montant ?? 'N/A'}'), // Need to adjust subtitle content
+                          // Add more details as needed
+                        );
+                      },
+                    ),
     );
   }
 }
