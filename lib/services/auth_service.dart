@@ -72,6 +72,12 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateUser(User updatedUser) async {
+    _currentUser = updatedUser;
+    await _saveUserToPrefs();
+    notifyListeners();
+  }
+
   Future<void> _saveUserToPrefs() async {
     if (_currentUser != null) {
       final prefs = await SharedPreferences.getInstance();
