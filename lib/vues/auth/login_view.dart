@@ -76,11 +76,7 @@ class _LoginViewState extends State<LoginView> {
                 height: 200,
                 width: 200,
               ),
-<<<<<<< HEAD
               const SizedBox(height: 32),
-=======
-              const SizedBox(height: 16),
->>>>>>> bfde5ea2db9de8eb247075c9526325a8cc86a9eb
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(

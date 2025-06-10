@@ -117,7 +117,7 @@ class _GestionVillesViewState extends State<GestionVillesView> {
             token: authService.currentUser?.token,
           );
 
-          if (response.statusCode == 201) {
+          if (response.statusCode == 200) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Ville ajoutée avec succès')),

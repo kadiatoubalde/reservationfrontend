@@ -78,16 +78,7 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
     final user = authService.currentUser;
 
     if (!authService.isAuthenticated || userRole != 'PASSAGER') {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Accès refusé. Vous n\'avez pas le rôle Passager.'),
-            backgroundColor: Colors.redAccent,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        Navigator.pushReplacementNamed(context, '/login');
-      });
+      Navigator.pushReplacementNamed(context, '/login');
       return const SizedBox.shrink();
     }
 

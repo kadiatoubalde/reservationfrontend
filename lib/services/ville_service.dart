@@ -26,7 +26,7 @@ class VilleService {
 
   static Future<VilleDto> create(VilleDto ville, String token) async {
     final response = await ApiService.post(_endpoint, ville.toJson(), token: token);
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return VilleDto.fromJson(json.decode(response.body));
     } else {
       throw Exception('Échec de la création de la ville');

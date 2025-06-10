@@ -18,16 +18,7 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
     final user = authService.currentUser;
 
     if (!authService.isAuthenticated || userRole != 'CHAUFFEUR') {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Accès refusé. Vous n\'avez pas le rôle Chauffeur.'),
-              backgroundColor: Colors.redAccent,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        Navigator.pushReplacementNamed(context, '/login'); 
-      });
+      Navigator.pushReplacementNamed(context, '/login');
       return const SizedBox.shrink();
     }
 
