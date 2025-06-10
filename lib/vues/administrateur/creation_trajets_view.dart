@@ -162,7 +162,7 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
           token: authService.currentUser?.token,
         );
 
-        if (response.statusCode == 201) {
+        if (response.statusCode == 200) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Trajet créé avec succès')),

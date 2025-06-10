@@ -26,7 +26,7 @@ class TrajetService {
 
   static Future<String> create(TrajetDto trajet, String token) async {
     final response = await ApiService.post(_endpoint, trajet.toJson(), token: token);
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return "Ajouté avec succès";
       //TrajetDto.fromJson(json.decode(response.body));
     } else {
