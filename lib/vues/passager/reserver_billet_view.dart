@@ -43,7 +43,7 @@ class _ReserverBilletViewState extends State<ReserverBilletView> {
     final userRole = authService.userRole;
 
     if (!authService.isAuthenticated || userRole != 'PASSAGER') {
-      Navigator.pushReplacementNamed(context, '/login');
+      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
       return const SizedBox.shrink();
     }
 

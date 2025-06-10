@@ -18,7 +18,7 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
     final user = authService.currentUser;
 
     if (!authService.isAuthenticated || userRole != 'CHAUFFEUR') {
-      Navigator.pushReplacementNamed(context, '/login');
+      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
       return const SizedBox.shrink();
     }
 

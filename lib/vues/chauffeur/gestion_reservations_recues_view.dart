@@ -51,7 +51,7 @@ class _GestionReservationsRecuesViewState extends State<GestionReservationsRecue
     final userRole = authService.userRole;
 
     if (!authService.isAuthenticated || userRole != 'CHAUFFEUR') {
-      Navigator.pushReplacementNamed(context, '/login');
+      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
       return const SizedBox.shrink();
     }
 

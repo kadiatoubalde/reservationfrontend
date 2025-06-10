@@ -64,16 +64,7 @@ class _TableauBordViewState extends State<TableauBordView> with SingleTickerProv
     final user = authService.currentUser;
 
     if (!authService.isAuthenticated || user?.role != 'ADMINISTRATEUR') {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Accès refusé. Vous n\'avez pas le rôle Administrateur.'),
-            backgroundColor: Colors.redAccent,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        Navigator.pushReplacementNamed(context, '/login');
-      });
+      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
       return const SizedBox.shrink();
     }
 

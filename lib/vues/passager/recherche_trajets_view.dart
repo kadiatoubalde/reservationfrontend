@@ -78,7 +78,7 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
     final user = authService.currentUser;
 
     if (!authService.isAuthenticated || userRole != 'PASSAGER') {
-      Navigator.pushReplacementNamed(context, '/login');
+      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
       return const SizedBox.shrink();
     }
 
