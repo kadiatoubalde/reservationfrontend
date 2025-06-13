@@ -31,11 +31,14 @@ class ApiService {
     };
   }
 
-  static Future<http.Response> get(String endpoint, {String? token}) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: token != null ? getAuthHeaders(token) : headers,
-    );
+  static Future<http.Response> get(String endpoint, {String? token, Map<String, dynamic>? queryParams}) async {
+    final uri = Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(uri, headers: headers);
     return response;
   }
 

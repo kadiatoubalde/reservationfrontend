@@ -7,6 +7,7 @@ class TrajetDto {
   double? montant;
   DateTime? dateDepart;
   DateTime? timeDepart;
+  String? chauffeurId;
 
   TrajetDto({
     this.uuid,
@@ -17,6 +18,7 @@ class TrajetDto {
     this.montant,
     this.dateDepart,
     this.timeDepart,
+    this.chauffeurId,
   });
 
   factory TrajetDto.fromJson(Map<String, dynamic> json) {
@@ -44,6 +46,7 @@ class TrajetDto {
       montant: json['montant']?.toDouble(),
       dateDepart: json['dateDepart'] != null ? DateTime.parse(json['dateDepart']) : null,
       timeDepart: _parseTime(json['timeDepart']),
+      chauffeurId: json['chauffeurId'],
     );
   }
 
@@ -57,6 +60,7 @@ class TrajetDto {
       'montant': montant,
       'dateDepart': dateDepart,
       'timeDepart': timeDepart,
+      'chauffeurId': chauffeurId,
     };
   }
 } 

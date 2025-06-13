@@ -233,17 +233,39 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
                               itemCount: _filteredTrajets.length,
                               itemBuilder: (context, index) {
                                 final trajet = _filteredTrajets[index];
-                                print('Displaying trajet: ${trajet.pointDepart} -> ${trajet.pointArriver}'); // Debug print
+                                final isAttributed = trajet.chauffeurId != null;
+                                final attributedChauffeur = isAttributed 
+                                    ? _chauffeurs.firstWhere(
+                                        (c) => c.uuid == trajet.chauffeurId,
+                                        orElse: () => User(),
+                                      )
+                                    : null;
+
                                 return Card(
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 8,
                                   ),
+                                  color: isAttributed ? Colors.grey[100] : null,
                                   child: ExpansionTile(
+                                    leading: isAttributed
+                                        ? Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: const Icon(
+                                              Icons.check_circle,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : null,
                                     title: Text(
                                       '${trajet.pointDepart ?? 'N/A'} → ${trajet.pointArriver ?? 'N/A'}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
+                                        color: isAttributed ? Colors.green[700] : null,
                                       ),
                                     ),
                                     subtitle: Column(
@@ -257,6 +279,16 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
                                         Text(
                                           'Heure: ${trajet.timeDepart != null ? TimeOfDay.fromDateTime(trajet.timeDepart!).format(context) : 'N/A'}',
                                         ),
+                                        if (isAttributed && attributedChauffeur != null) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Chauffeur: ${attributedChauffeur.firstname ?? 'N/A'} ${attributedChauffeur.lastname ?? 'N/A'}',
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                     children: [
@@ -269,7 +301,7 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
                                               'Prix: ${trajet.montant ?? 'N/A'} GNF',
                                             ),
                                             const SizedBox(height: 16),
-                                            if (_chauffeurs.isNotEmpty) ...[
+                                            if (!isAttributed && _chauffeurs.isNotEmpty) ...[
                                               const Text(
                                                 'Attribuer à un chauffeur:',
                                                 style: TextStyle(
@@ -302,7 +334,15 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
                                                   );
                                                 }).toList(),
                                               ),
-                                            ] else
+                                            ] else if (isAttributed)
+                                              const Text(
+                                                'Ce trajet est déjà attribué à un chauffeur',
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              )
+                                            else
                                               const Text(
                                                 'Aucun chauffeur disponible',
                                                 style: TextStyle(
