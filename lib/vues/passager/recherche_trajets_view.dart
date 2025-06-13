@@ -175,6 +175,14 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.list),
+              title: const Text('Liste des trajets'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/passager/liste_trajets');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.confirmation_number),
               title: const Text('Mes réservations'),
               onTap: () {

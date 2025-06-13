@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
+import '../../services/trajet_service.dart';
 import '../../models/user.dart';
 import '../../models/trajetDto.dart';
 import '../../models/villeDto.dart';
+import '../../models/statut_trajet.dart';
 import 'dart:convert';
 
 class AttributionTrajetsChauffeursView extends StatefulWidget {
@@ -138,6 +140,83 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<void> _changeStatus(String trajetId, StatutTrajet newStatus) async {
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final success = await TrajetService.changeStatus(
+        trajetId,
+        newStatus.toString().split('.').last,
+        authService.currentUser?.token ?? '',
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Statut mis à jour avec succès')),
+        );
+        _loadData(); // Recharger la liste pour voir les changements
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  String _getStatusLabel(StatutTrajet? status) {
+    if (status == null) return 'Non défini';
+    switch (status) {
+      case StatutTrajet.PLANIFIE:
+        return 'Planifié';
+      case StatutTrajet.OUVERT:
+        return 'Ouvert';
+      case StatutTrajet.EN_COURS:
+        return 'En cours';
+      case StatutTrajet.COMPLET:
+        return 'Complet';
+      case StatutTrajet.TERMINE:
+        return 'Terminé';
+      case StatutTrajet.ANNULE:
+        return 'Annulé';
+      case StatutTrajet.EXPIRE:
+        return 'Expiré';
+      case StatutTrajet.EN_ATTENTE_VALIDATION:
+        return 'En attente de validation';
+      case StatutTrajet.BLOQUE:
+        return 'Bloqué';
+      case StatutTrajet.ARCHIVE:
+        return 'Archivé';
+    }
+  }
+
+  Color _getStatusColor(StatutTrajet? status) {
+    if (status == null) return Colors.grey;
+    switch (status) {
+      case StatutTrajet.PLANIFIE:
+        return Colors.blue;
+      case StatutTrajet.OUVERT:
+        return Colors.green;
+      case StatutTrajet.EN_COURS:
+        return Colors.orange;
+      case StatutTrajet.COMPLET:
+        return Colors.purple;
+      case StatutTrajet.TERMINE:
+        return Colors.green;
+      case StatutTrajet.ANNULE:
+        return Colors.red;
+      case StatutTrajet.EXPIRE:
+        return Colors.grey;
+      case StatutTrajet.EN_ATTENTE_VALIDATION:
+        return Colors.amber;
+      case StatutTrajet.BLOQUE:
+        return Colors.red;
+      case StatutTrajet.ARCHIVE:
+        return Colors.grey;
     }
   }
 
@@ -279,16 +358,18 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
                                         Text(
                                           'Heure: ${trajet.timeDepart != null ? TimeOfDay.fromDateTime(trajet.timeDepart!).format(context) : 'N/A'}',
                                         ),
-                                        if (isAttributed && attributedChauffeur != null) ...[
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Chauffeur: ${attributedChauffeur.firstname ?? 'N/A'} ${attributedChauffeur.lastname ?? 'N/A'}',
-                                            style: const TextStyle(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Prix: ${trajet.montant ?? 'N/A'} GNF',
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Statut: ${_getStatusLabel(trajet.status)}',
+                                          style: TextStyle(
+                                            color: _getStatusColor(trajet.status),
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        ],
+                                        ),
                                       ],
                                     ),
                                     children: [
@@ -297,8 +378,29 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              'Prix: ${trajet.montant ?? 'N/A'} GNF',
+                                            const Text(
+                                              'Changer le statut:',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            DropdownButtonFormField<StatutTrajet>(
+                                              value: trajet.status,
+                                              decoration: const InputDecoration(
+                                                border: OutlineInputBorder(),
+                                              ),
+                                              items: StatutTrajet.values.map((status) {
+                                                return DropdownMenuItem(
+                                                  value: status,
+                                                  child: Text(_getStatusLabel(status)),
+                                                );
+                                              }).toList(),
+                                              onChanged: (StatutTrajet? newValue) {
+                                                if (newValue != null) {
+                                                  _changeStatus(trajet.uuid!, newValue);
+                                                }
+                                              },
                                             ),
                                             const SizedBox(height: 16),
                                             if (!isAttributed && _chauffeurs.isNotEmpty) ...[

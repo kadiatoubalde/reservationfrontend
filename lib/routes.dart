@@ -9,6 +9,7 @@ import 'vues/profil_view.dart';
 import 'vues/passager/recherche_trajets_view.dart';
 import 'vues/passager/reserver_billet_view.dart';
 import 'vues/passager/liste_reservations_view.dart';
+import 'vues/passager/liste_trajets_view.dart';
 
 // Import placeholder views for Chauffeur
 import 'vues/chauffeur/liste_trajets_affectes_view.dart';
@@ -30,6 +31,7 @@ class Routes {
   static const String passagerRechercheTrajets = '/passager/recherche_trajets';
   static const String passagerReserverBillet = '/passager/reserver_billet';
   static const String passagerListeReservations = '/passager/liste_reservations';
+  static const String passagerListeTrajets = '/passager/liste_trajets';
   static const String profil = '/profil';
 
   // Chauffeur Routes
@@ -86,6 +88,10 @@ class Routes {
       case passagerListeReservations:
         return MaterialPageRoute(
           builder: (_) => const ListeReservationsView(),
+        );
+      case passagerListeTrajets:
+        return MaterialPageRoute(
+          builder: (_) => const ListeTrajetsView(),
         );
 
       // Profil Route
