@@ -134,9 +134,77 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final user = authService.currentUser;
+
+    if (!authService.isAuthenticated || authService.userRole != 'PASSAGER') {
+      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
+      return const SizedBox.shrink();
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rechercher un trajet'),
+        title: const Text('Recherche de Trajets'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+              ),
+              accountName: Text(
+                '${user?.firstname ?? ''} ${user?.lastname ?? ''}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              accountEmail: Text(user?.email ?? ''),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  user?.firstname?.substring(0, 1).toUpperCase() ?? '',
+                  style: const TextStyle(fontSize: 40.0, color: Colors.black54),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: const Text('Rechercher des trajets'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.confirmation_number),
+              title: const Text('Mes réservations'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/passager/liste_reservations');
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Mon Profil'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/profil');
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Déconnexion'),
+              onTap: () async {
+                final authService = Provider.of<AuthService>(context, listen: false);
+                await authService.logout();
+                if (mounted) {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              },
+            ),
+          ],
+        ),
       ),
       body: _isLoadingVilles
           ? const Center(child: CircularProgressIndicator())

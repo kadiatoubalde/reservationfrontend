@@ -51,11 +51,12 @@ class ApiService {
     return response;
   }
 
-  static Future<http.Response> put(String endpoint, dynamic data, {String? token}) async {
+  static Future<http.Response> put(String endpoint, dynamic data, {String? token, Map<String, dynamic>? queryParams}) async {
+    final uri = Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
     final response = await http.put(
-      Uri.parse('$baseUrl$endpoint'),
+      uri,
       headers: token != null ? getAuthHeaders(token) : headers,
-      body: json.encode(data),
+      body: data != null ? json.encode(data) : null,
     );
     return response;
   }

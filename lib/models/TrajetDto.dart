@@ -1,3 +1,5 @@
+import 'statut_trajet.dart';
+
 class TrajetDto {
   String? uuid;
   String? pointDepart;
@@ -8,6 +10,7 @@ class TrajetDto {
   DateTime? dateDepart;
   DateTime? timeDepart;
   String? chauffeurId;
+  StatutTrajet? status;
 
   TrajetDto({
     this.uuid,
@@ -19,6 +22,7 @@ class TrajetDto {
     this.dateDepart,
     this.timeDepart,
     this.chauffeurId,
+    this.status,
   });
 
   factory TrajetDto.fromJson(Map<String, dynamic> json) {
@@ -47,6 +51,11 @@ class TrajetDto {
       dateDepart: json['dateDepart'] != null ? DateTime.parse(json['dateDepart']) : null,
       timeDepart: _parseTime(json['timeDepart']),
       chauffeurId: json['chauffeurId'],
+      status: json['status'] != null 
+          ? StatutTrajet.values.firstWhere(
+              (e) => e.toString().split('.').last == json['status'],
+              orElse: () => StatutTrajet.PLANIFIE)
+          : null,
     );
   }
 
@@ -58,9 +67,10 @@ class TrajetDto {
       'uuidPointDepart': uuidPointDepart,
       'uuidPointArriver': uuidPointArriver,
       'montant': montant,
-      'dateDepart': dateDepart,
-      'timeDepart': timeDepart,
+      'dateDepart': dateDepart?.toIso8601String(),
+      'timeDepart': timeDepart?.toIso8601String(),
       'chauffeurId': chauffeurId,
+      'status': status?.toString().split('.').last,
     };
   }
 } 

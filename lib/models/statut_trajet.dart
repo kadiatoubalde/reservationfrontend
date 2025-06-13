@@ -1,0 +1,12 @@
+enum StatutTrajet {
+  PLANIFIE,
+  OUVERT,
+  EN_COURS,
+  COMPLET,
+  TERMINE,
+  ANNULE,
+  EXPIRE,
+  EN_ATTENTE_VALIDATION,
+  BLOQUE,
+  ARCHIVE
+} 

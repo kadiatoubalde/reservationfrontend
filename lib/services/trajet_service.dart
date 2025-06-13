@@ -76,4 +76,33 @@ class TrajetService {
       throw Exception('Échec de la recherche des trajets');
     }
   }
+
+  static Future<List<TrajetDto>> getMesTrajets({required String token}) async {
+    final response = await ApiService.get(
+      '$_endpoint/chauffeur/mesTrajets',
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => TrajetDto.fromJson(json)).toList();
+    } else {
+      throw Exception('Échec de la récupération des trajets affectés');
+    }
+  }
+
+  static Future<bool> changeStatus(String id, String status, String token) async {
+    final response = await ApiService.put(
+      '$_endpoint/changeStatus/$id',
+      null,
+      token: token,
+      queryParams: {'status': status},
+    );
+    
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Échec du changement de statut du trajet');
+    }
+  }
 } 
