@@ -57,10 +57,6 @@ class AuthService extends ChangeNotifier {
     if (response.statusCode == 201) {
       final userData = json.decode(response.body);
       final registeredUserDto = UtilisateurDto.fromJson(userData);
-       // Depending on what the API returns on registration, you might want to:
-       // 1. Automatically log the user in: create User from registeredUserDto, save, notify, set _currentUser
-       // 2. Just confirm registration and require separate login: remove the User creation and saving logic here
-       // Assuming for now we redirect to login, so no User object creation needed here.
     } else {
       throw Exception('Échec de l\'inscription');
     }

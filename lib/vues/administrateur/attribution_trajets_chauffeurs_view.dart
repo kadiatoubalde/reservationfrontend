@@ -11,7 +11,6 @@ import 'dart:convert';
 
 class AttributionTrajetsChauffeursView extends StatefulWidget {
   const AttributionTrajetsChauffeursView({Key? key}) : super(key: key);
-
   @override
   State<AttributionTrajetsChauffeursView> createState() => _AttributionTrajetsChauffeursViewState();
 }

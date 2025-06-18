@@ -14,8 +14,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
   flutter_local_notifications: ^16.3.2
   cupertino_icons: ^1.0.8
   custom_text_form_field_plus: ^0.0.1
