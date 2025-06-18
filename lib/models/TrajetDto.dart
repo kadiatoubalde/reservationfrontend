@@ -54,7 +54,7 @@ class TrajetDto {
       status: json['status'] != null 
           ? StatutTrajet.values.firstWhere(
               (e) => e.toString().split('.').last == json['status'],
-              orElse: () => StatutTrajet.PLANIFIE)
+              orElse: () => StatutTrajet.DEMARRER)
           : null,
     );
   }

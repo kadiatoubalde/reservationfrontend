@@ -1,12 +1,19 @@
 enum StatutTrajet {
-  PLANIFIE,
-  OUVERT,
-  EN_COURS,
-  COMPLET,
-  TERMINE,
-  ANNULE,
-  EXPIRE,
-  EN_ATTENTE_VALIDATION,
-  BLOQUE,
-  ARCHIVE
+  DEMARRER,
+  TERMINER,
+  REPORTER
+  
+}
+
+String getStatusLabel(StatutTrajet status) {
+  switch (status) {
+    case StatutTrajet.DEMARRER:
+      return 'Démarré';
+    case StatutTrajet.TERMINER:
+      return 'Terminé';
+    case StatutTrajet.REPORTER:
+      return 'Reporté';
+    default:
+      return 'Non défini';
+  }
 } 

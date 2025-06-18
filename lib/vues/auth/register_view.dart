@@ -25,6 +25,12 @@ class _RegisterViewState extends State<RegisterView> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _selectedRole = 'PASSAGER';
+  }
+
+  @override
   void dispose() {
     _firstnameController.dispose();
     _lastnameController.dispose();
@@ -179,32 +185,6 @@ class _RegisterViewState extends State<RegisterView> {
                   }
                   if (value.length < 6) {
                     return 'Le mot de passe doit contenir au moins 6 caractères';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Rôle',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.work),
-                ),
-                value: _selectedRole,
-                items: _roles.map((String role) {
-                  return DropdownMenuItem<String>(
-                    value: role,
-                    child: Text(role),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedRole = newValue;
-                  });
-                },
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez sélectionner un rôle';
                   }
                   return null;
                 },

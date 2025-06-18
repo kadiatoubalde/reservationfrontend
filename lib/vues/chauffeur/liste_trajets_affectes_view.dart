@@ -253,51 +253,27 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
   String _getStatusLabel(StatutTrajet? status) {
     if (status == null) return 'Non défini';
     switch (status) {
-      case StatutTrajet.PLANIFIE:
-        return 'Planifié';
-      case StatutTrajet.OUVERT:
-        return 'Ouvert';
-      case StatutTrajet.EN_COURS:
-        return 'En cours';
-      case StatutTrajet.COMPLET:
-        return 'Complet';
-      case StatutTrajet.TERMINE:
+      case StatutTrajet.DEMARRER:
+        return 'Démarré';
+      case StatutTrajet.TERMINER:
         return 'Terminé';
-      case StatutTrajet.ANNULE:
-        return 'Annulé';
-      case StatutTrajet.EXPIRE:
-        return 'Expiré';
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return 'En attente de validation';
-      case StatutTrajet.BLOQUE:
-        return 'Bloqué';
-      case StatutTrajet.ARCHIVE:
-        return 'Archivé';
+      case StatutTrajet.REPORTER:
+        return 'Reporté';
+      default:
+        return 'Non défini';
     }
   }
 
   Color _getStatusColor(StatutTrajet? status) {
     if (status == null) return Colors.grey;
     switch (status) {
-      case StatutTrajet.PLANIFIE:
+      case StatutTrajet.DEMARRER:
         return Colors.blue;
-      case StatutTrajet.OUVERT:
+      case StatutTrajet.TERMINER:
         return Colors.green;
-      case StatutTrajet.EN_COURS:
+      case StatutTrajet.REPORTER:
         return Colors.orange;
-      case StatutTrajet.COMPLET:
-        return Colors.purple;
-      case StatutTrajet.TERMINE:
-        return Colors.green;
-      case StatutTrajet.ANNULE:
-        return Colors.red;
-      case StatutTrajet.EXPIRE:
-        return Colors.grey;
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return Colors.amber;
-      case StatutTrajet.BLOQUE:
-        return Colors.red;
-      case StatutTrajet.ARCHIVE:
+      default:
         return Colors.grey;
     }
   }
