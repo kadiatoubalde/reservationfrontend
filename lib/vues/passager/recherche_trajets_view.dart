@@ -361,11 +361,13 @@ class _RechercheTrajetsViewState extends State<RechercheTrajetsView> {
                                 ),
                                 trailing: ElevatedButton(
                                   onPressed: () {
-                                    // TODO: Naviguer vers la page de réservation
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Fonctionnalité de réservation à implémenter'),
-                                      ),
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/passager/reserver_billet',
+                                      arguments: {
+                                        'trajetUuid': trajet.uuid,
+                                        'placesDispo': trajet.placesDisponibles ?? 1,
+                                      },
                                     );
                                   },
                                   child: const Text('Réserver'),

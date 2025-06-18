@@ -11,6 +11,7 @@ class TrajetDto {
   DateTime? timeDepart;
   String? chauffeurId;
   StatutTrajet? status;
+  int? placesDisponibles;
 
   TrajetDto({
     this.uuid,
@@ -23,6 +24,7 @@ class TrajetDto {
     this.timeDepart,
     this.chauffeurId,
     this.status,
+    this.placesDisponibles,
   });
 
   factory TrajetDto.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,7 @@ class TrajetDto {
               (e) => e.toString().split('.').last == json['status'],
               orElse: () => StatutTrajet.PLANIFIE)
           : null,
+      placesDisponibles: json['placesDisponibles'],
     );
   }
 
@@ -71,6 +74,7 @@ class TrajetDto {
       'timeDepart': timeDepart?.toIso8601String(),
       'chauffeurId': chauffeurId,
       'status': status?.toString().split('.').last,
+      'placesDisponibles': placesDisponibles,
     };
   }
 } 

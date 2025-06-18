@@ -1,9 +1,12 @@
-import '../models/reservationDto.dart';
+import '../models/ReservationDto.dart';
 import 'api_service.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../models/ma_reservation_dto.dart';
 
 class ReservationService {
   static const String _endpoint = '/reservations';
+  static const String baseUrl = 'http://localhost:8080/api';
 
   static Future<List<ReservationDto>> getAll(String token) async {
     final response = await ApiService.get(_endpoint, token: token);
@@ -56,6 +59,41 @@ class ReservationService {
       return data.map((json) => ReservationDto.fromJson(json)).toList();
     } else {
       throw Exception('Échec du chargement des réservations de l\'utilisateur');
+    }
+  }
+
+  Future<void> createReservation(ReservationDto reservation, String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/reservations/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(reservation.toJson()),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to create reservation: \n${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error creating reservation: $e');
+    }
+  }
+
+  static Future<List<MaReservationDto>> getMesReservations(String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/reservations/mesReservations'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => MaReservationDto.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur lors du chargement des réservations');
     }
   }
 } 

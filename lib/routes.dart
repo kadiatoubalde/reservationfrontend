@@ -82,8 +82,12 @@ class Routes {
           builder: (_) => const RechercheTrajetsView(),
         );
       case passagerReserverBillet:
+        final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-          builder: (_) => const ReserverBilletView(),
+          builder: (_) => ReserverBilletView(
+            trajetUuid: args['trajetUuid'],
+            placesDispo: args['placesDispo'],
+          ),
         );
       case passagerListeReservations:
         return MaterialPageRoute(
