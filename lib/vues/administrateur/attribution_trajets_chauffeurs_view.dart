@@ -181,16 +181,8 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
         return 'Complet';
       case StatutTrajet.TERMINE:
         return 'Terminé';
-      case StatutTrajet.ANNULE:
-        return 'Annulé';
-      case StatutTrajet.EXPIRE:
-        return 'Expiré';
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return 'En attente de validation';
-      case StatutTrajet.BLOQUE:
-        return 'Bloqué';
-      case StatutTrajet.ARCHIVE:
-        return 'Archivé';
+      default:
+        return 'Inconnu';
     }
   }
 
@@ -207,15 +199,7 @@ class _AttributionTrajetsChauffeursViewState extends State<AttributionTrajetsCha
         return Colors.purple;
       case StatutTrajet.TERMINE:
         return Colors.green;
-      case StatutTrajet.ANNULE:
-        return Colors.red;
-      case StatutTrajet.EXPIRE:
-        return Colors.grey;
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return Colors.amber;
-      case StatutTrajet.BLOQUE:
-        return Colors.red;
-      case StatutTrajet.ARCHIVE:
+      default:
         return Colors.grey;
     }
   }

@@ -1,6 +1,7 @@
 import '../models/trajetDto.dart';
 import 'api_service.dart';
 import 'dart:convert';
+import '../models/PassagerDto.dart';
 
 class TrajetService {
   static const String _endpoint = '/trajets';
@@ -103,6 +104,20 @@ class TrajetService {
       return json.decode(response.body);
     } else {
       throw Exception('Échec du changement de statut du trajet');
+    }
+  }
+
+  static Future<List<PassagerDto>> getMesPassagers(String token) async {
+    final response = await ApiService.get(
+      '$_endpoint/chauffeur/mesPassager',
+      token: token,
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => PassagerDto.fromJson(json)).toList();
+    } else {
+      throw Exception('Échec de la récupération des passagers');
     }
   }
 } 

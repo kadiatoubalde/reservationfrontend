@@ -19,8 +19,7 @@ class _RegisterViewState extends State<RegisterView> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  String? _selectedRole;
-  final List<String> _roles = ['PASSAGER', 'CHAUFFEUR', 'ADMINISTRATEUR'];
+  String get _selectedRole => 'PASSAGER';
 
   bool _isLoading = false;
 
@@ -35,9 +34,6 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   Future<void> _register() async {
-    if (_selectedRole == null) {
-    }
-
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -51,7 +47,7 @@ class _RegisterViewState extends State<RegisterView> {
           email: _usernameController.text,
           telephone: _telephoneController.text,
           password: _passwordController.text,
-          role: _selectedRole!,
+          role: _selectedRole,
         );
 
         await authService.register(utilisateurDto);
@@ -179,32 +175,6 @@ class _RegisterViewState extends State<RegisterView> {
                   }
                   if (value.length < 6) {
                     return 'Le mot de passe doit contenir au moins 6 caractères';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Rôle',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.work),
-                ),
-                value: _selectedRole,
-                items: _roles.map((String role) {
-                  return DropdownMenuItem<String>(
-                    value: role,
-                    child: Text(role),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedRole = newValue;
-                  });
-                },
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Veuillez sélectionner un rôle';
                   }
                   return null;
                 },

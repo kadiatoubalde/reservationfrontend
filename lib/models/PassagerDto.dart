@@ -1,51 +1,35 @@
 class PassagerDto {
-  String? uuid;
-  String? nom;
-  String? prenom;
-  String? adresse;
-  String? telephone;
-  String? telephonePersonneContact;
-  String? adressePersonneContact;
-  String? civilite;
-  String? genre;
+  final String uuid;
+  final String lastname;
+  final String firstname;
+  final String telephone;
+  final int nombreBillet;
 
   PassagerDto({
-    this.uuid,
-    this.nom,
-    this.prenom,
-    this.adresse,
-    this.telephone,
-    this.telephonePersonneContact,
-    this.adressePersonneContact,
-    this.civilite,
-    this.genre,
+    required this.uuid,
+    required this.lastname,
+    required this.firstname,
+    required this.telephone,
+    required this.nombreBillet,
   });
 
   factory PassagerDto.fromJson(Map<String, dynamic> json) {
     return PassagerDto(
       uuid: json['uuid'],
-      nom: json['nom'],
-      prenom: json['prenom'],
-      adresse: json['adresse'],
+      lastname: json['lastname'],
+      firstname: json['firstname'],
       telephone: json['telephone'],
-      telephonePersonneContact: json['telephonePersonneContact'],
-      adressePersonneContact: json['adressePersonneContact'],
-      civilite: json['civilite'],
-      genre: json['genre'],
+      nombreBillet: json['nombreBiillet'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'uuid': uuid,
-      'nom': nom,
-      'prenom': prenom,
-      'adresse': adresse,
+      'lastname': lastname,
+      'firstname': firstname,
       'telephone': telephone,
-      'telephonePersonneContact': telephonePersonneContact,
-      'adressePersonneContact': adressePersonneContact,
-      'civilite': civilite,
-      'genre': genre,
+      'nombreBiillet': nombreBillet,
     };
   }
 } 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/trajet_service.dart';
+import '../../models/PassagerDto.dart';
 
 class GestionReservationsRecuesView extends StatefulWidget {
   const GestionReservationsRecuesView({Key? key}) : super(key: key);
@@ -10,123 +12,72 @@ class GestionReservationsRecuesView extends StatefulWidget {
 }
 
 class _GestionReservationsRecuesViewState extends State<GestionReservationsRecuesView> {
-  // Données fictives pour la démonstration
-  final List<Map<String, dynamic>> _reservations = [
-    {
-      'id': 1,
-      'passager': 'Jean Dupont',
-      'trajet': 'Fria → Conakry',
-      'date': '2024-03-20',
-      'heure': '10:00',
-      'statut': 'En attente',
-      'places': 2,
-    },
-    {
-      'id': 2,
-      'passager': 'Marie Martin',
-      'trajet': 'Mamou → Labé',
-      'date': '2024-03-21',
-      'heure': '14:30',
-      'statut': 'Confirmée',
-      'places': 1,
-    },
-  ];
+  List<PassagerDto> _passagers = [];
+  bool _isLoading = true;
+  String? _error;
 
-  void _changerStatutReservation(int reservationId, String nouveauStatut) {
+  @override
+  void initState() {
+    super.initState();
+    _loadPassagers();
+  }
+
+  Future<void> _loadPassagers() async {
     setState(() {
-      final reservation = _reservations.firstWhere((r) => r['id'] == reservationId);
-      reservation['statut'] = nouveauStatut;
+      _isLoading = true;
+      _error = null;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Réservation ${nouveauStatut.toLowerCase()}'),
-        backgroundColor: nouveauStatut == 'Confirmée' ? Colors.green : Colors.orange,
-      ),
-    );
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final token = authService.currentUser?.token;
+      if (token != null) {
+        _passagers = await TrajetService.getMesPassagers(token);
+      } else {
+        _error = 'Utilisateur non authentifié';
+      }
+    } catch (e) {
+      _error = 'Erreur lors du chargement des passagers: ${e.toString()}';
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
-    final userRole = authService.userRole;
-
-    if (!authService.isAuthenticated || userRole != 'CHAUFFEUR') {
-      Future.microtask(() => Navigator.pushReplacementNamed(context, '/login'));
-      return const SizedBox.shrink();
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion des Réservations'),
+        title: const Text('Mes Passagers'),
       ),
-      body: ListView.builder(
-        itemCount: _reservations.length,
-        itemBuilder: (context, index) {
-          final reservation = _reservations[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Réservation #${reservation['id']}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: reservation['statut'] == 'Confirmée'
-                              ? Colors.green
-                              : Colors.orange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          reservation['statut'],
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Passager: ${reservation['passager']}'),
-                  const SizedBox(height: 8),
-                  Text('Trajet: ${reservation['trajet']}'),
-                  const SizedBox(height: 8),
-                  Text('Date: ${reservation['date']} à ${reservation['heure']}'),
-                  const SizedBox(height: 8),
-                  Text('Places: ${reservation['places']}'),
-                  const SizedBox(height: 16),
-                  if (reservation['statut'] == 'En attente')
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => _changerStatutReservation(
-                              reservation['id'], 'Refusée'),
-                          child: const Text('Refuser'),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () => _changerStatutReservation(
-                              reservation['id'], 'Confirmée'),
-                          child: const Text('Confirmer'),
-                        ),
-                      ],
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Text(_error!))
+              : _passagers.isEmpty
+                  ? const Center(child: Text('Aucun passager trouvé'))
+                  : ListView.builder(
+                      itemCount: _passagers.length,
+                      itemBuilder: (context, index) {
+                        final passager = _passagers[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text(passager.firstname.isNotEmpty ? passager.firstname[0].toUpperCase() : '?'),
+                            ),
+                            title: Text('${passager.firstname} ${passager.lastname}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Téléphone : ${passager.telephone}'),
+                                Text('Billets : ${passager.nombreBillet}'),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 } 

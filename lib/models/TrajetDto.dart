@@ -12,6 +12,8 @@ class TrajetDto {
   String? chauffeurId;
   StatutTrajet? status;
   int? placesDisponibles;
+  int? nombrePlaces;
+  String? typeVehicule;
 
   TrajetDto({
     this.uuid,
@@ -25,6 +27,8 @@ class TrajetDto {
     this.chauffeurId,
     this.status,
     this.placesDisponibles,
+    this.nombrePlaces,
+    this.typeVehicule,
   });
 
   factory TrajetDto.fromJson(Map<String, dynamic> json) {
@@ -59,6 +63,8 @@ class TrajetDto {
               orElse: () => StatutTrajet.PLANIFIE)
           : null,
       placesDisponibles: json['placesDisponibles'],
+      nombrePlaces: json['nombrePlaces'],
+      typeVehicule: json['typeVehicule'],
     );
   }
 
@@ -75,6 +81,8 @@ class TrajetDto {
       'chauffeurId': chauffeurId,
       'status': status?.toString().split('.').last,
       'placesDisponibles': placesDisponibles,
+      'nombrePlaces': nombrePlaces,
+      'typeVehicule': typeVehicule,
     };
   }
 } 

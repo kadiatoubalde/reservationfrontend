@@ -128,6 +128,14 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
                 Navigator.pushNamed(context, '/profil');
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('Mes Passagers'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/chauffeur/gestion_reservations_recues');
+              },
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -175,73 +183,87 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
                         itemBuilder: (context, index) {
                           final trajet = _trajets[index];
                           return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: ExpansionTile(
-                              title: Text(
-                                '${trajet.pointDepart ?? 'N/A'} → ${trajet.pointArriver ?? 'N/A'}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Column(
+                            elevation: 3,
+                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Date: ${trajet.dateDepart?.toString().split('.')[0] ?? 'N/A'}',
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Heure: ${trajet.timeDepart != null ? TimeOfDay.fromDateTime(trajet.timeDepart!).format(context) : 'N/A'}',
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Prix: ${trajet.montant ?? 'N/A'} GNF',
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Statut: ${_getStatusLabel(trajet.status)}',
-                                    style: TextStyle(
-                                      color: _getStatusColor(trajet.status),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text(
-                                        'Changer le statut:',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: Text(
+                                          '${trajet.pointDepart ?? 'N/A'} → ${trajet.pointArriver ?? 'N/A'}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      DropdownButtonFormField<StatutTrajet>(
-                                        value: trajet.status,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: _getStatusColor(trajet.status).withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        items: StatutTrajet.values.map((status) {
-                                          return DropdownMenuItem(
-                                            value: status,
-                                            child: Text(_getStatusLabel(status)),
-                                          );
-                                        }).toList(),
-                                        onChanged: (StatutTrajet? newValue) {
-                                          if (newValue != null) {
-                                            _changeStatus(trajet.uuid!, newValue);
-                                          }
-                                        },
+                                        child: Text(
+                                          _getStatusLabel(trajet.status),
+                                          style: TextStyle(
+                                            color: _getStatusColor(trajet.status),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${trajet.dateDepart?.toString().split(' ')[0] ?? 'N/A'} à ${trajet.timeDepart != null ? TimeOfDay.fromDateTime(trajet.timeDepart!).format(context) : 'N/A'}',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.money, size: 16, color: Colors.grey),
+                                      const SizedBox(width: 8),
+                                      Text('${trajet.montant ?? 'N/A'} GNF'),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    'Changer le statut :',
+                                    style: TextStyle(fontWeight: FontWeight.w500),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  DropdownButtonFormField<StatutTrajet>(
+                                    value: trajet.status,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    ),
+                                    items: StatutTrajet.values.map((status) {
+                                      return DropdownMenuItem(
+                                        value: status,
+                                        child: Text(_getStatusLabel(status)),
+                                      );
+                                    }).toList(),
+                                    onChanged: (StatutTrajet? newValue) {
+                                      if (newValue != null) {
+                                        _changeStatus(trajet.uuid!, newValue);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -263,16 +285,6 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
         return 'Complet';
       case StatutTrajet.TERMINE:
         return 'Terminé';
-      case StatutTrajet.ANNULE:
-        return 'Annulé';
-      case StatutTrajet.EXPIRE:
-        return 'Expiré';
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return 'En attente de validation';
-      case StatutTrajet.BLOQUE:
-        return 'Bloqué';
-      case StatutTrajet.ARCHIVE:
-        return 'Archivé';
     }
   }
 
@@ -289,16 +301,6 @@ class _ListeTrajetsAffectesViewState extends State<ListeTrajetsAffectesView> {
         return Colors.purple;
       case StatutTrajet.TERMINE:
         return Colors.green;
-      case StatutTrajet.ANNULE:
-        return Colors.red;
-      case StatutTrajet.EXPIRE:
-        return Colors.grey;
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return Colors.amber;
-      case StatutTrajet.BLOQUE:
-        return Colors.red;
-      case StatutTrajet.ARCHIVE:
-        return Colors.grey;
     }
   }
 }

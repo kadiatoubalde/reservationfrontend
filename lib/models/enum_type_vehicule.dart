@@ -1,7 +1,9 @@
-enum EnumTypeVehicule {
-   BUS,
-   MINI_BUS,
-   TAXI
-   ,
-  
+enum TypeVehicule {
+  TAXI,
+  MINIBUS,
+  BUS,
+  MOTO_TAXI,
+  PARTICULIER,
+  CAMIONNETTE,
+  CAMION,
 } 

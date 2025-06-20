@@ -6,6 +6,7 @@ import '../../models/villeDto.dart';
 import '../../models/trajetDto.dart';
 import 'dart:convert';
 import '../../routes.dart';
+import '../../models/enum_type_vehicule.dart';
 
 class CreationTrajetsView extends StatefulWidget {
   const CreationTrajetsView({Key? key}) : super(key: key);
@@ -28,6 +29,9 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
   List<TrajetDto> _trajets = [];
   bool _isLoadingTrajets = true;
   String? _errorTrajets;
+  final _nombrePlacesController = TextEditingController();
+  TypeVehicule? _typeVehicule;
+  final List<TypeVehicule> _typesVehicule = TypeVehicule.values;
 
   @override
   void initState() {
@@ -39,6 +43,7 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
   @override
   void dispose() {
     _prixController.dispose();
+    _nombrePlacesController.dispose();
     super.dispose();
   }
 
@@ -154,6 +159,8 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
           'montant': double.parse(_prixController.text),
           'dateDepart': dateTime.toIso8601String(),
           'timeDepart': dateTime.toIso8601String(),
+          'nombrePlaces': int.parse(_nombrePlacesController.text),
+          'typeVehicule': _typeVehicule?.name,
         };
 
         final response = await ApiService.post(
@@ -345,7 +352,7 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
                                 decoration: const InputDecoration(
                                   labelText: 'Prix',
                                   border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.attach_money),
+                                  prefixIcon: Icon(Icons.money),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -358,6 +365,29 @@ class _CreationTrajetsViewState extends State<CreationTrajetsView> {
                                   }
                                   return null;
                                 },
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _nombrePlacesController,
+                                decoration: const InputDecoration(labelText: 'Nombre de places'),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) return 'Entrez le nombre de places';
+                                  if (int.tryParse(value) == null) return 'Nombre invalide';
+                                  if (int.parse(value) <= 0) return 'Doit être > 0';
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              DropdownButtonFormField<TypeVehicule>(
+                                value: _typeVehicule,
+                                items: _typesVehicule.map((type) => DropdownMenuItem(
+                                  value: type,
+                                  child: Text(type.name),
+                                )).toList(),
+                                onChanged: (value) => setState(() => _typeVehicule = value),
+                                decoration: const InputDecoration(labelText: 'Type de véhicule'),
+                                validator: (value) => value == null ? 'Sélectionnez un type de véhicule' : null,
                               ),
                               const SizedBox(height: 24),
                               ElevatedButton(

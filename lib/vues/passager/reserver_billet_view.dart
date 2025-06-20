@@ -16,12 +16,13 @@ class ReserverBilletView extends StatefulWidget {
 class _ReserverBilletViewState extends State<ReserverBilletView> {
   final _formKey = GlobalKey<FormState>();
   final _nombreBagageController = TextEditingController();
-  int _nombreBillets = 1;
+  final _nombreBilletsController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _nombreBagageController.dispose();
+    _nombreBilletsController.dispose();
     super.dispose();
   }
 
@@ -32,7 +33,7 @@ class _ReserverBilletViewState extends State<ReserverBilletView> {
         final reservation = ReservationDto(
           trajetUuid: widget.trajetUuid,
           nombreBagage: int.parse(_nombreBagageController.text),
-          nombreBillets: _nombreBillets,
+          nombreBillets: int.parse(_nombreBilletsController.text),
         );
         final authService = Provider.of<AuthService>(context, listen: false);
         final token = authService.currentUser?.token ?? '';
@@ -70,25 +71,24 @@ class _ReserverBilletViewState extends State<ReserverBilletView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Nombre de billets',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<int>(
-                value: _nombreBillets,
-                decoration: const InputDecoration(),
-                items: List.generate(
-                  widget.placesDispo,
-                  (index) => DropdownMenuItem<int>(
-                    value: index + 1,
-                    child: Text('${index + 1}'),
-                  ),
+              TextFormField(
+                controller: _nombreBilletsController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de billets',
                 ),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() { _nombreBillets = value; });
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Entrez le nombre de billets';
                   }
+                  final number = int.tryParse(value);
+                  if (number == null) {
+                    return 'Nombre invalide';
+                  }
+                  if (number <= 0) {
+                    return 'Doit être > 0';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),

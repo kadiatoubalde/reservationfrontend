@@ -131,13 +131,18 @@ class _GestionVillesViewState extends State<GestionVillesView> {
         }
       } catch (e) {
         if (mounted) {
+          final errorMessage = e.toString().replaceFirst('Exception: ', '').trim();
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Erreur: ${e.toString()}'),
-              backgroundColor: Colors.red,
+              content: Text('$errorMessage'),
+              backgroundColor: Colors.redAccent,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
+
       } finally {
         if (mounted) {
           setState(() {

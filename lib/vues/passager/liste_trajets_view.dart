@@ -68,16 +68,6 @@ class _ListeTrajetsViewState extends State<ListeTrajetsView> {
         return 'Complet';
       case StatutTrajet.TERMINE:
         return 'Terminé';
-      case StatutTrajet.ANNULE:
-        return 'Annulé';
-      case StatutTrajet.EXPIRE:
-        return 'Expiré';
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return 'En attente de validation';
-      case StatutTrajet.BLOQUE:
-        return 'Bloqué';
-      case StatutTrajet.ARCHIVE:
-        return 'Archivé';
     }
   }
 
@@ -94,16 +84,6 @@ class _ListeTrajetsViewState extends State<ListeTrajetsView> {
         return Colors.purple;
       case StatutTrajet.TERMINE:
         return Colors.green;
-      case StatutTrajet.ANNULE:
-        return Colors.red;
-      case StatutTrajet.EXPIRE:
-        return Colors.grey;
-      case StatutTrajet.EN_ATTENTE_VALIDATION:
-        return Colors.amber;
-      case StatutTrajet.BLOQUE:
-        return Colors.red;
-      case StatutTrajet.ARCHIVE:
-        return Colors.grey;
     }
   }
 
@@ -281,19 +261,27 @@ class _ListeTrajetsViewState extends State<ListeTrajetsView> {
                                       children: [
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Date: ${trajet.dateDepart?.toString().split('.')[0] ?? 'N/A'}',
+                                          'Date:  A0${trajet.dateDepart?.toString().split('.')[0] ?? 'N/A'}',
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Heure: ${trajet.timeDepart != null ? TimeOfDay.fromDateTime(trajet.timeDepart!).format(context) : 'N/A'}',
+                                          'Heure:  A0${trajet.timeDepart != null ? TimeOfDay.fromDateTime(trajet.timeDepart!).format(context) : 'N/A'}',
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Prix: ${trajet.montant ?? 'N/A'} GNF',
+                                          'Prix:  A0${trajet.montant ?? 'N/A'} GNF',
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Statut: ${_getStatusLabel(trajet.status)}',
+                                          'Places:  A0${trajet.nombrePlaces ?? 'N/A'}',
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Véhicule:  A0${trajet.typeVehicule ?? 'N/A'}',
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Statut:  A0${_getStatusLabel(trajet.status)}',
                                           style: TextStyle(
                                             color: _getStatusColor(trajet.status),
                                             fontWeight: FontWeight.bold,
@@ -313,7 +301,10 @@ class _ListeTrajetsViewState extends State<ListeTrajetsView> {
                                                       Navigator.pushNamed(
                                                         context,
                                                         '/passager/reserver_billet',
-                                                        arguments: trajet,
+                                                        arguments: {
+                                                          'trajetUuid': trajet.uuid,
+                                                          'placesDispo': trajet.placesDisponibles ?? 1,
+                                                        },
                                                       );
                                                     }
                                                   : null,
